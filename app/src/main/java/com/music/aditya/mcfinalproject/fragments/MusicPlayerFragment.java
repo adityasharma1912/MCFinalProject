@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.MediaController;
 
 import com.music.aditya.mcfinalproject.R;
@@ -44,7 +45,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     private boolean musicBound = false;
 
     private boolean paused = false;
-    private boolean playbackPaused = false;
+    private boolean playbackPaused = true;
 
     public MusicPlayerFragment() {
         // Required empty public constructor
@@ -53,13 +54,15 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     @Override
     public void onStart() {
         super.onStart();
-        if (playIntent == null) {
-            playIntent = new Intent(getActivity(), MusicService.class);
-            getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            getActivity().startService(playIntent);
-        }
-        setController();
+        controller.show();
     }
+
+    @Override
+    public void onStop() {
+        controller.realHide();
+        super.onStop();
+    }
+
 
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
@@ -103,7 +106,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     private void playNext() {
         musicSrv.playNext();
         if (playbackPaused) {
-//            setController();
+            setController();
             playbackPaused = false;
         }
         if (!controller.isShown())
@@ -119,12 +122,6 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
         }
         if (!controller.isShown())
             controller.show();
-    }
-
-    @Override
-    public void onStop() {
-        controller.hide();
-        super.onStop();
     }
 
     @Override
@@ -211,7 +208,6 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
      *
      * @return A new instance of fragment MusicPlayerFragment.
      */
-    // TODO: Rename and change types and number of parameters
 //    public static MusicPlayerFragment newInstance(String param1, String param2) {
 //        MusicPlayerFragment fragment = new MusicPlayerFragment();
 //        Bundle args = new Bundle();
@@ -223,6 +219,16 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (playIntent == null) {
+            playIntent = new Intent(getActivity(), MusicService.class);
+            getActivity().startService(playIntent);
+            getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+        }
+
+        controller = new MusicController(getActivity());
+        setController();
+
         if (getArguments() != null) {
             songPosition = getArguments().getInt(ARG_SONG_POSITION);
             songsList = getArguments().getParcelableArrayList(ARG_SONG_LIST);
@@ -234,9 +240,18 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_music_screen_control, container, false);
-        controller = new MusicController(getActivity());
+        ImageView imageView = (ImageView) rootView.findViewById(R.id.music_screen_bg);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (controller != null && !controller.isShowing())
+                    controller.show();
+            }
+        });
+//        controller = new MusicController(getActivity());
         return rootView;
     }
+
 
     private void setAndPlaySong() {
         musicSrv.setSong(songPosition);
@@ -259,6 +274,8 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        if (controller != null && !controller.isShown())
+            controller.show();
 //        if (context instanceof OnFragmentInteractionListener) {
 //            mListener = (OnFragmentInteractionListener) context;
 //        } else {
@@ -270,6 +287,12 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     @Override
     public void onDetach() {
         super.onDetach();
+        if (controller != null && controller.isShown())
+            controller.realHide();
+        if (musicBound == true) {
+            getActivity().unbindService(musicConnection);
+            musicBound = false;
+        }
         mListener = null;
     }
 
@@ -278,7 +301,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p>
+     * <p/>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.

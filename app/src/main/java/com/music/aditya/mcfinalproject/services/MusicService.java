@@ -1,7 +1,5 @@
 package com.music.aditya.mcfinalproject.services;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ContentUris;
 import android.content.Intent;
@@ -15,8 +13,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.music.aditya.mcfinalproject.R;
-import com.music.aditya.mcfinalproject.activities.MusicPlayerActivity;
 import com.music.aditya.mcfinalproject.utils.Song;
 
 import java.util.ArrayList;
@@ -81,8 +77,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public boolean onUnbind(Intent intent) {
-        player.stop();
-        player.release();
+//        player.stop();
+//        player.release();
         return false;
     }
 
@@ -170,7 +166,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
-        Intent notIntent = new Intent(this, MusicPlayerActivity.class);
+        /*Intent notIntent = new Intent(this, MusicPlayerActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -183,11 +179,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .setContentText(songTitle);
 
         Notification not = builder.build();
-        startForeground(NOTIFY_ID, not);
+        startForeground(NOTIFY_ID, not);*/
     }
 
     @Override
     public void onDestroy() {
+        player.stop();
+        player.release();
         stopForeground(true);
     }
 }

@@ -1,6 +1,7 @@
 package com.music.aditya.mcfinalproject.controller;
 
 import android.content.Context;
+import android.view.KeyEvent;
 import android.widget.MediaController;
 
 /**
@@ -14,7 +15,19 @@ public class MusicController extends MediaController {
     }
 
     public void hide() {
-
+        return;
     }
 
+    public void realHide() {
+        super.hide();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (keyCode == KeyEvent.KEYCODE_BACK)
+            super.hide();
+
+        return super.dispatchKeyEvent(event);
+    }
 }

@@ -106,14 +106,14 @@ public class MusicLibraryFragment extends Fragment {
                 String thisMimeType = musicCursor.getString(mimeTypeColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                String songInfo = "";
+                /*String songInfo = "";
 
                 for (String columnName : musicCursor.getColumnNames()) {
                     songInfo += columnName + " ";
                     songInfo += musicCursor.getString(musicCursor.getColumnIndex(columnName)) + " ";
                 }
 
-                Log.v(TAG, songInfo);
+                Log.v(TAG, songInfo);*/
                 songsList.add(new Song(thisId, thisTitle, thisArtist));
             }
             while (musicCursor.moveToNext());
