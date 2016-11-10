@@ -1,14 +1,9 @@
 package com.music.aditya.mcfinalproject.fragments;
 
-import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,14 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.music.aditya.mcfinalproject.R;
-import com.music.aditya.mcfinalproject.controller.MusicController;
-import com.music.aditya.mcfinalproject.services.MusicService;
 import com.music.aditya.mcfinalproject.utils.Song;
+import com.music.aditya.mcfinalproject.utils.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,127 +30,53 @@ import java.util.List;
 /**
  * Created by aditya on 11/2/16.
  */
-public class MusicLibraryFragment extends Fragment implements MediaController.MediaPlayerControl {
+public class MusicLibraryFragment extends Fragment {
 
     public static final String TAG = MusicLibraryFragment.class.getCanonicalName();
-    private ArrayList<Song> songList;
+    private ArrayList<Song> songsList;
     private RecyclerView songView;
 
-    private MusicService musicSrv;
-    private Intent playIntent;
-    private boolean musicBound = false;
-    private MusicController controller;
+//    private MusicService musicSrv;
+//    private MusicController controller;
+//    private Intent playIntent;
+//    private boolean musicBound = false;
 
-    private boolean paused = false;
-    private boolean playbackPaused = false;
+//    private boolean paused = false;
+//    private boolean playbackPaused = false;
 
-    private void setController() {
-        controller.setPrevNextListeners(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playNext();
-            }
-
-        }, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playPrev();
-            }
-        });
-
-        controller.setMediaPlayer(this);
-        controller.setAnchorView(getActivity().findViewById(R.id.song_list));
-        controller.setEnabled(true);
-    }
-
-    //play next
-    private void playNext() {
-        musicSrv.playNext();
-        if (playbackPaused) {
-//            setController();
-            playbackPaused = false;
-        }
-        if (!controller.isShown())
-            controller.show();
-    }
-
-    //play previous
-    private void playPrev() {
-        musicSrv.playPrevious();
-        if (playbackPaused) {
-            setController();
-            playbackPaused = false;
-        }
-        if (!controller.isShown())
-            controller.show();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (playIntent == null) {
-            playIntent = new Intent(getActivity(), MusicService.class);
-            getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-            getActivity().startService(playIntent);
-        }
-        setController();
-    }
-
-    @Override
-
-    public void onStop() {
-        controller.hide();
-        super.onStop();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        paused = true;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (paused) {
-            setController();
-            paused = false;
-        }
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.v(TAG, "onCreateView");
-        View rootView = inflater.inflate(R.layout.music_library, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_music_library, container, false);
         songView = (RecyclerView) rootView.findViewById(R.id.song_list);
         songView.setLayoutManager(new LinearLayoutManager(getActivity()));
         //small testing going on
-        controller = new MusicController(getActivity());
-        songList = new ArrayList();
+//        controller = new MusicController(getActivity());
+        songsList = new ArrayList();
         getSongList();
-        Log.v(TAG, "" + songList.size());
-        songView.setAdapter(new RecyclerListAdapter(songList));
+        Log.v(TAG, "" + songsList.size());
+        songView.setAdapter(new RecyclerListAdapter(songsList));
         return rootView;
     }
 
-    private ServiceConnection musicConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
-            //get service
-            musicSrv = binder.getService();
-            //pass list
-            musicSrv.setList(songList);
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            musicBound = false;
-        }
-    };
+//    private ServiceConnection musicConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+//            //get service
+//            musicSrv = binder.getService();
+//            //pass list
+//            musicSrv.setList(songsList);
+//            musicBound = true;
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            musicBound = false;
+//        }
+//    };
 
     public void getSongList() {
         ContentResolver musicResolver = getActivity().getContentResolver();
@@ -195,73 +114,10 @@ public class MusicLibraryFragment extends Fragment implements MediaController.Me
                 }
 
                 Log.v(TAG, songInfo);
-                songList.add(new Song(thisId, thisTitle, thisArtist));
+                songsList.add(new Song(thisId, thisTitle, thisArtist));
             }
             while (musicCursor.moveToNext());
         }
-    }
-
-    @Override
-    public void start() {
-        playbackPaused = false;
-        musicSrv.startPlayer();
-    }
-
-    @Override
-    public void pause() {
-        playbackPaused = true;
-        musicSrv.pausePlayer();
-    }
-
-    @Override
-    public int getDuration() {
-        if (musicSrv != null && musicBound && musicSrv.isPlaying())
-            return musicSrv.getDuration();
-        else return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        if (musicSrv != null && musicBound && musicSrv.isPlaying())
-            return musicSrv.getPosition();
-        else return 0;
-    }
-
-    @Override
-    public void seekTo(int pos) {
-        musicSrv.seek(pos);
-    }
-
-    @Override
-    public boolean isPlaying() {
-        if (musicSrv != null && musicBound)
-            return musicSrv.isPlaying();
-        return false;
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public boolean canPause() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return true;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return 0;
     }
 
     private class PersonalViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -283,14 +139,18 @@ public class MusicLibraryFragment extends Fragment implements MediaController.Me
             switch (v.getId()) {
                 case R.id.song_layout:
                     Toast.makeText(getActivity(), "song with title : " + songTitle.getText() + " requested", Toast.LENGTH_SHORT).show();
-                    musicSrv.setSong(this.getAdapterPosition());
-                    musicSrv.playSong();
-                    if (playbackPaused) {
-                        setController();
-                        playbackPaused = false;
-                    }
-                    if (!controller.isShown())
-                        controller.show();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(MusicPlayerFragment.ARG_SONG_POSITION, this.getAdapterPosition());
+                    bundle.putParcelableArrayList(MusicPlayerFragment.ARG_SONG_LIST, songsList);
+                    Utility.navigateFragment(new MusicPlayerFragment(), MusicPlayerFragment.TAG, bundle, getActivity());
+//                    musicSrv.setSong(this.getAdapterPosition());
+//                    musicSrv.playSong();
+//                    if (playbackPaused) {
+//                        setController();
+//                        playbackPaused = false;
+//                    }
+//                    if (!controller.isShown())
+//                        controller.show();
                     break;
             }
         }
@@ -306,12 +166,12 @@ public class MusicLibraryFragment extends Fragment implements MediaController.Me
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_shuffle:
-                musicSrv.setShuffle();
+//                musicSrv.setShuffle();
                 break;
 
             case R.id.action_end:
-                getActivity().stopService(playIntent);
-                musicSrv = null;
+//                getActivity().stopService(playIntent);
+//                musicSrv = null;
                 System.exit(0);
                 break;
         }
