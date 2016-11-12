@@ -39,7 +39,7 @@ public class Utility {
         mapArtistGenre.put("3 Doors Down", "Soft Rock");
         mapArtistGenre.put("Imagine Dragons", "Soft Rock");
         mapArtistGenre.put("Eagles", "Soft Rock");
-        mapArtistGenre.put("Blues", "Jimi Hendrix");
+        mapArtistGenre.put("Jimi Hendrix", "Blues");
     }
 
     public static void navigateFragment(Fragment fragment, String tag, Bundle bundle, FragmentActivity fragmentActivity) {

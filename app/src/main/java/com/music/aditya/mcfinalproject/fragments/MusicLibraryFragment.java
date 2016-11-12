@@ -107,6 +107,8 @@ public class MusicLibraryFragment extends Fragment {
                 String thisArtist = musicCursor.getString(artistColumn);
                 String thisGenre = Utility.getGenre(thisArtist);
 
+                Log.v(TAG,"Artist*"+thisArtist+"*");
+
                 if (mapGenreSongs.containsKey(thisGenre)) {
                     mapGenreSongs.get(thisGenre).add(new Song(thisId, thisTitle, thisArtist, thisGenre));
                 } else {
@@ -119,7 +121,7 @@ public class MusicLibraryFragment extends Fragment {
 
             Log.v(TAG, "Total Songs = " + mapGenreSongs.size());
             for (String str : mapGenreSongs.keySet())
-                Log.v(TAG, "Artist : " + str + " songs = " + mapGenreSongs.get(str).size());
+                Log.v(TAG, "Genre : " + str + " songs = " + mapGenreSongs.get(str).size());
 
         } else {
             Utility.showToast(getActivity(), "Add some music files to your device first!!!");
