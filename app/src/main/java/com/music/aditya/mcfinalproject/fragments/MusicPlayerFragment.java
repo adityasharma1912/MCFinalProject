@@ -26,12 +26,8 @@ import java.util.ArrayList;
  * Activities that contain this fragment must implement the
  * {@link MusicPlayerFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MusicPlayerFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class MusicPlayerFragment extends Fragment implements MediaController.MediaPlayerControl {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_SONG_POSITION = "songPosition";
     public static final String ARG_SONG_LIST = "songList";
     public static final String TAG = MusicPlayerFragment.class.getCanonicalName();
@@ -202,20 +198,6 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
         return 0;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment MusicPlayerFragment.
-     */
-//    public static MusicPlayerFragment newInstance(String param1, String param2) {
-//        MusicPlayerFragment fragment = new MusicPlayerFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_SONG_POSITION, param1);
-//        args.putString(ARG_SONG_LIST, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -301,7 +283,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
+     * <p>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.

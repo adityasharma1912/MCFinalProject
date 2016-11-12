@@ -14,11 +14,33 @@ import android.widget.Toast;
 
 import com.music.aditya.mcfinalproject.R;
 
+import java.util.HashMap;
+
 /**
  * Created by aditya on 11/9/2016.
  */
 
 public class Utility {
+
+    // hash-map of artists as key and Genre as value...
+    private static HashMap<String, String> mapArtistGenre = null;
+
+
+    public static void loadArtistGenreHashMap() {
+        mapArtistGenre = new HashMap<>();
+        mapArtistGenre.put("Eminem", "Hip Hop");
+        mapArtistGenre.put("Ken Kaniff", "Hip Hop");
+        mapArtistGenre.put("Jay-Z", "Hip Hop");
+        mapArtistGenre.put("Maroon 5", "Pop");
+        mapArtistGenre.put("Breaking Benjamin", "Hard Rock");
+        mapArtistGenre.put("System Of A Down", "Hard Rock");
+        mapArtistGenre.put("Metallica", "Metal");
+        mapArtistGenre.put("Children of Bodom", "Metal");
+        mapArtistGenre.put("3 Doors Down", "Soft Rock");
+        mapArtistGenre.put("Imagine Dragons", "Soft Rock");
+        mapArtistGenre.put("Eagles", "Soft Rock");
+        mapArtistGenre.put("Blues", "Jimi Hendrix");
+    }
 
     public static void navigateFragment(Fragment fragment, String tag, Bundle bundle, FragmentActivity fragmentActivity) {
         boolean fragmentPopped = false;
@@ -55,5 +77,13 @@ public class Utility {
             }
         }
         return true;
+    }
+
+    public static String getGenre(String artist) {
+        if (artist.contains("Eminem"))
+            artist = "Eminem";
+        if (mapArtistGenre != null && mapArtistGenre.containsKey(artist))
+            return mapArtistGenre.get(artist);
+        return "Unknown";
     }
 }
