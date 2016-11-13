@@ -16,7 +16,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.music.aditya.mcfinalproject.R;
-import com.music.aditya.mcfinalproject.fragments.MusicLibraryFragment;
+import com.music.aditya.mcfinalproject.fragments.MusicGenreFragment;
 import com.music.aditya.mcfinalproject.utils.Utility;
 
 public class MusicPlayerActivity extends AppCompatActivity
@@ -42,7 +42,7 @@ public class MusicPlayerActivity extends AppCompatActivity
 
         String[] permission = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         if (Utility.checkForPermission(this, permission, PERMISSIONS_REQUEST_STORAGE)) {
-            Utility.navigateFragment(new MusicLibraryFragment(), MusicLibraryFragment.TAG, null, MusicPlayerActivity.this);
+            Utility.navigateFragment(new MusicGenreFragment(), MusicGenreFragment.TAG, null, MusicPlayerActivity.this);
         } else {
             Utility.showToast(MusicPlayerActivity.this, "Need storage permissions");
             finish();
@@ -62,7 +62,7 @@ public class MusicPlayerActivity extends AppCompatActivity
                 return;
             }
             String name = fragmentManager.getBackStackEntryAt(count - 1).getName();
-            if (name.equalsIgnoreCase(MusicLibraryFragment.TAG)) {
+            if (name.equalsIgnoreCase(MusicGenreFragment.TAG)) {
                 showDialogOnExit();
             } else {
                 fragmentManager.popBackStackImmediate();
@@ -118,8 +118,8 @@ public class MusicPlayerActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            Utility.showToast(MusicPlayerActivity.this, "Launching MusicLibraryFragment");
-            Utility.navigateFragment(new MusicLibraryFragment(), MusicLibraryFragment.TAG, null, MusicPlayerActivity.this);
+            Utility.showToast(MusicPlayerActivity.this, "Launching MusicGenreFragment");
+            Utility.navigateFragment(new MusicGenreFragment(), MusicGenreFragment.TAG, null, MusicPlayerActivity.this);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -135,7 +135,7 @@ public class MusicPlayerActivity extends AppCompatActivity
 
 //        FragmentManager fragmentManager = getSupportFragmentManager();
 //        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.add(R.id.container_fragment, new MusicLibraryFragment());
+//        fragmentTransaction.add(R.id.container_fragment, new MusicGenreFragment());
 //        fragmentTransaction.commit();
 
 

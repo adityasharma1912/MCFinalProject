@@ -27,6 +27,28 @@ public class Song implements Parcelable {
         genre = parcel.readString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Song)) return false;
+
+        Song song = (Song) o;
+        if (this.id != song.id)
+            return false;
+        if (!this.title.equals(song.title))
+            return false;
+        if (!this.artist.equals(song.artist))
+            return false;
+        if (!this.genre.equals(song.genre))
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return title.hashCode() + artist.hashCode() + genre.hashCode() + (int) this.id;
+    }
+
     public long getID() {
         return id;
     }

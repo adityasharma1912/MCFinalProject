@@ -94,7 +94,8 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
         });
 
         controller.setMediaPlayer(this);
-        controller.setAnchorView(getActivity().findViewById(R.id.music_screen_bg));
+        if (getActivity() != null)
+            controller.setAnchorView(getActivity().findViewById(R.id.music_screen_bg));
         controller.setEnabled(true);
     }
 

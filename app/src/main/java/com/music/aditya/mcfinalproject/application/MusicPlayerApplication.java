@@ -2,6 +2,7 @@ package com.music.aditya.mcfinalproject.application;
 
 import android.app.Application;
 
+import com.music.aditya.mcfinalproject.database.MusicChoiceDbHelper;
 import com.music.aditya.mcfinalproject.utils.Utility;
 
 /**
@@ -13,5 +14,8 @@ public class MusicPlayerApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Utility.loadArtistGenreHashMap();
+        MusicChoiceDbHelper musicChoiceDbHelper = MusicChoiceDbHelper.getMusicChoiceDbHelper(getApplicationContext());
+        musicChoiceDbHelper.getWritableDatabase();
+        musicChoiceDbHelper.createMusicTable();
     }
 }

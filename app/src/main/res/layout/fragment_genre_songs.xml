@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context=".fragments.MusicLibraryFragment">
+    tools:context=".fragments.MusicGenreFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/song_list"

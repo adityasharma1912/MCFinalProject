@@ -2,6 +2,7 @@ package com.music.aditya.mcfinalproject.services;
 
 import android.app.Service;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -13,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.music.aditya.mcfinalproject.database.MusicChoiceDbHelper;
 import com.music.aditya.mcfinalproject.utils.Song;
 
 import java.util.ArrayList;
@@ -151,10 +153,20 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onCompletion(MediaPlayer mp) {
         Toast.makeText(this, "onCompletion Called", Toast.LENGTH_SHORT).show();
-        if (player.getCurrentPosition() > 0) {
-            mp.reset();
-            playNext();
-        }
+        MusicChoiceDbHelper musicChoiceDbHelper = MusicChoiceDbHelper.getMusicChoiceDbHelper(getApplicationContext());
+        int count = musicChoiceDbHelper.getSongCount(songsList.get(songPosition).getID());
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MusicChoiceDbHelper.MUSIC_COLUMN_SONG_ID, songsList.get(songPosition).getID());
+        contentValues.put(MusicChoiceDbHelper.MUSIC_COLUMN_SONG_ARTIST, songsList.get(songPosition).getArtist());
+        contentValues.put(MusicChoiceDbHelper.MUSIC_COLUMN_SONG_TITLE, songsList.get(songPosition).getTitle());
+        contentValues.put(MusicChoiceDbHelper.MUSIC_COLUMN_SONG_GENRE, songsList.get(songPosition).getGenre());
+        contentValues.put(MusicChoiceDbHelper.MUSIC_COLUMN_LISTEN_COUNT, count + 1);
+        musicChoiceDbHelper.insertOrUpdateMusicData(contentValues);
+
+//        if (player.getCurrentPosition() > 0) {
+//            mp.reset();
+        playNext();
+//        }
     }
 
     @Override

@@ -24,6 +24,7 @@ public class Utility {
 
     // hash-map of artists as key and Genre as value...
     private static HashMap<String, String> mapArtistGenre = null;
+    public static final int SUGGESTION_LIMIT = 20;
 
 
     public static void loadArtistGenreHashMap() {
