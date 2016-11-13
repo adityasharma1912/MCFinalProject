@@ -8,15 +8,14 @@
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
     cardView:cardUseCompatPadding="true"
-    cardView:contentPadding="5dp"
     cardView:elevation="5dp">
 
     <LinearLayout
         android:id="@+id/song_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp">
 
         <TextView
             android:id="@+id/song_title"

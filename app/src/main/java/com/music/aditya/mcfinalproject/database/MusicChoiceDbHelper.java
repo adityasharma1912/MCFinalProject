@@ -95,6 +95,11 @@ public class MusicChoiceDbHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    //Clear whole table
+    public int clearSuggestionsDb() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(TABLE_NAME, null, null);
+    }
 
     public int numberOfRows() {
         SQLiteDatabase db = this.getReadableDatabase();

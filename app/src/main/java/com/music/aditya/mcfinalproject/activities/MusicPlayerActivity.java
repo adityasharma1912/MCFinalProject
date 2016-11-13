@@ -13,9 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.music.aditya.mcfinalproject.R;
+import com.music.aditya.mcfinalproject.database.MusicChoiceDbHelper;
 import com.music.aditya.mcfinalproject.fragments.MusicGenreFragment;
 import com.music.aditya.mcfinalproject.utils.Utility;
 
@@ -93,23 +93,23 @@ public class MusicPlayerActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.music_player, menu);
+//        getMenuInflater().inflate(R.menu.music_player, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_shuffle:
-                Toast.makeText(this, "action shuffle", Toast.LENGTH_SHORT).show();
-                break;
-
-            case R.id.action_end:
-                Toast.makeText(this, "action end", Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.action_shuffle:
+//                Toast.makeText(this, "action shuffle", Toast.LENGTH_SHORT).show();
+//                break;
+//
+//            case R.id.action_end:
+//                Toast.makeText(this, "action end", Toast.LENGTH_SHORT).show();
+//                break;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -120,7 +120,13 @@ public class MusicPlayerActivity extends AppCompatActivity
         if (id == R.id.nav_camera) {
             Utility.showToast(MusicPlayerActivity.this, "Launching MusicGenreFragment");
             Utility.navigateFragment(new MusicGenreFragment(), MusicGenreFragment.TAG, null, MusicPlayerActivity.this);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_clear_suggestions) {
+            MusicChoiceDbHelper musicChoiceDbHelper = MusicChoiceDbHelper.getMusicChoiceDbHelper(getApplicationContext());
+            if (musicChoiceDbHelper.clearSuggestionsDb() > 0)
+                Utility.showToast(this, "Suggestions Cleared");
+            else
+                Utility.showToast(this, "No Suggestions already");
+            Utility.navigateFragment(new MusicGenreFragment(), MusicGenreFragment.TAG, null, MusicPlayerActivity.this);
 
         } else if (id == R.id.nav_slideshow) {
 

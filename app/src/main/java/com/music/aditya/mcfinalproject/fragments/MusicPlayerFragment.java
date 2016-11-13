@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.MediaController;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.music.aditya.mcfinalproject.R;
 import com.music.aditya.mcfinalproject.controller.MusicController;
 import com.music.aditya.mcfinalproject.services.MusicService;
@@ -231,6 +233,8 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
                     controller.show();
             }
         });
+        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView);
+        Glide.with(this).load(R.drawable.dance).into(imageViewTarget);
 //        controller = new MusicController(getActivity());
         return rootView;
     }

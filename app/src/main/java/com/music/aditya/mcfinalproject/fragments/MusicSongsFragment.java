@@ -1,5 +1,6 @@
 package com.music.aditya.mcfinalproject.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -214,6 +215,8 @@ public class MusicSongsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(PersonalViewHolder holder, int position) {
+            if (position % 2 == 0)
+                holder.songLayout.setBackgroundColor(Color.LTGRAY);
             holder.songTitle.setText(songsList.get(position).getTitle());
             holder.songArtist.setText(songsList.get(position).getArtist());
         }

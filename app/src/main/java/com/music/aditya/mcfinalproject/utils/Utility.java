@@ -36,7 +36,8 @@ public class Utility {
         mapArtistGenre.put("Breaking Benjamin", "Hard Rock");
         mapArtistGenre.put("System Of A Down", "Hard Rock");
         mapArtistGenre.put("Metallica", "Metal");
-        mapArtistGenre.put("Children of Bodom", "Metal");
+        mapArtistGenre.put("Children Of Bodom", "Metal");
+        mapArtistGenre.put("Iron Maiden", "Metal");
         mapArtistGenre.put("3 Doors Down", "Soft Rock");
         mapArtistGenre.put("Imagine Dragons", "Soft Rock");
         mapArtistGenre.put("Eagles", "Soft Rock");
