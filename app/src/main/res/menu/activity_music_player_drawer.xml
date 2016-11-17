@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group android:checkableBehavior="single">
         <item
@@ -11,13 +12,17 @@
             android:icon="@drawable/ic_menu_delete"
             android:title="Clear Suggestions" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/nav_flash_light_switch"
+            android:icon="@drawable/ic_wb_incandescent"
+            android:title="Flash Light Dance"
+            app:actionLayout="@layout/flash_light_toggle" />
+
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/nav_auto_bright_switch"
+            android:icon="@drawable/ic_brightness_auto"
+            android:title="Auto Brightness"
+            app:actionLayout="@layout/auto_brightness_toggle" />
+
     </group>
 
     <item android:title="Communicate">

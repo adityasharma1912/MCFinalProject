@@ -3,11 +3,20 @@ package com.music.aditya.mcfinalproject.services;
 import android.app.Service;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,6 +28,7 @@ import android.widget.Toast;
 
 import com.music.aditya.mcfinalproject.database.MusicChoiceDbHelper;
 import com.music.aditya.mcfinalproject.utils.Song;
+import com.music.aditya.mcfinalproject.utils.Utility;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -26,8 +36,10 @@ import java.util.Random;
 /**
  * Created by aditya on 11/2/16.
  */
-public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener {
+public class MusicService extends Service implements MediaPlayer.OnPreparedListener,
+        MediaPlayer.OnErrorListener, MediaPlayer.OnCompletionListener, SensorEventListener {
 
+    private static final String TAG = MusicService.class.getCanonicalName();
     private MediaPlayer player;
     private ArrayList<Song> songsList;
     private int songPosition;
@@ -40,6 +52,20 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final String SONG_TITLE = "song_title";
     public static final int SET_SONG_TITLE = 221;
 
+    private CameraManager mCameraManager;
+    private String mCameraId;
+    private boolean isTorchOn;
+
+    private SensorManager senSensorManager;
+    private Sensor sensorAccelerometer;
+
+    //Declaring variables to detect speed
+    private long lastUpdate = 0;
+    private float last_x, last_y, last_z;
+    private long timerValue = 500;
+    private static final int SHAKE_THRESHOLD = 2000;
+    private static final int SPEEDUP_THRESHOLD = 3000;
+
     private final IBinder musicBind = new MusicBinder();
 
     @Override
@@ -47,6 +73,78 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         super.onCreate();
         songPosition = 0;
         initMusicPlayer();
+        mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensorAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        senSensorManager.registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        try {
+            mCameraId = mCameraManager.getCameraIdList()[0];
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    boolean isFlashLightAvailable() {
+        Boolean isFlashAvailable = getApplicationContext().getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+        return isFlashAvailable;
+    }
+
+    public void startFlashLightThread() {
+        if (isFlashLightAvailable()) {
+            FlashLightThread flashLightThread = new FlashLightThread();
+            flashLightThread.start();
+        } else {
+            Log.v(TAG, "FlashLight not available in device");
+        }
+    }
+
+    class FlashLightThread extends Thread {
+        @Override
+        public void run() {
+            while (Utility.flashLightBoolean == true && isPlaying()) {
+                try {
+                    if (isTorchOn) {
+                        turnOffFlashLight();
+                        isTorchOn = false;
+                    } else {
+                        turnOnFlashLight();
+                        isTorchOn = true;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    sleep(timerValue);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void turnOnFlashLight() {
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mCameraManager.setTorchMode(mCameraId, true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void turnOffFlashLight() {
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mCameraManager.setTorchMode(mCameraId, false);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void setList(ArrayList<Song> theSongs) {
@@ -64,6 +162,42 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void setHandler(Handler handler) {
         this.handler = handler;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        Sensor mySensor = sensorEvent.sensor;
+
+        if (mySensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = sensorEvent.values[0] + 10;
+            float y = sensorEvent.values[1] + 10;
+            float z = sensorEvent.values[2] + 10;
+            //updating after every 100 milliseconds
+            long curTime = System.currentTimeMillis();
+            if ((curTime - lastUpdate) > 100) {
+                long diffTime = (curTime - lastUpdate);
+                lastUpdate = curTime;
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z) / diffTime * 10000;
+                if (speed > SHAKE_THRESHOLD) {
+                    Log.v(TAG, "Speed = " + speed);
+                    Log.v(TAG, "SpeedLight = " + timerValue);
+                    if (speed > SPEEDUP_THRESHOLD) {
+                        timerValue = 100;
+                    } else {
+                        timerValue = 1000;
+                    }
+                }
+                last_x = x;
+                last_y = y;
+                last_z = z;
+            }
+
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
 
@@ -195,6 +329,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         message.what = SET_SONG_TITLE;
         message.setData(bundle);
         handler.sendMessage(message);
+
+        startFlashLightThread();
         /*Intent notIntent = new Intent(this, MusicPlayerActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
@@ -209,6 +345,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         Notification not = builder.build();
         startForeground(NOTIFY_ID, not);*/
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.v(TAG, "Flash Light Turned off");
+        senSensorManager.unregisterListener(this);
+        turnOffFlashLight();
+        stopSelf();
     }
 
     @Override
