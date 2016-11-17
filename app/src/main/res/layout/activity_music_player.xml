@@ -19,7 +19,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_musci_player"
+        app:headerLayout="@layout/nav_header_music_player"
         app:menu="@menu/activity_music_player_drawer" />
 
 </android.support.v4.widget.DrawerLayout>

@@ -8,7 +8,10 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -30,8 +33,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private int songPosition;
     private boolean shuffle = false;
     private Random rand;
+    private Handler handler;
     private String songTitle = "";
     private static final int NOTIFY_ID = 1;
+
+    public static final String SONG_TITLE = "song_title";
+    public static final int SET_SONG_TITLE = 221;
 
     private final IBinder musicBind = new MusicBinder();
 
@@ -53,6 +60,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void setShuffle() {
         if (shuffle) shuffle = false;
         else shuffle = true;
+    }
+
+    public void setHandler(Handler handler) {
+        this.handler = handler;
     }
 
 
@@ -178,6 +189,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
+        Bundle bundle = new Bundle();
+        Message message = handler.obtainMessage();
+        bundle.putString(SONG_TITLE, songTitle);
+        message.what = SET_SONG_TITLE;
+        message.setData(bundle);
+        handler.sendMessage(message);
         /*Intent notIntent = new Intent(this, MusicPlayerActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
