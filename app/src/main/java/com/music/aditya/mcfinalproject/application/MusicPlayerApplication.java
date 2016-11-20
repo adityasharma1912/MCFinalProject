@@ -17,6 +17,7 @@ public class MusicPlayerApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Utility.loadArtistGenreHashMap();
+        Utility.loadGenreImageHashMap();
         MusicChoiceDbHelper musicChoiceDbHelper = MusicChoiceDbHelper.getMusicChoiceDbHelper(getApplicationContext());
         musicChoiceDbHelper.getWritableDatabase();
         musicChoiceDbHelper.createMusicTable();
@@ -25,6 +26,6 @@ public class MusicPlayerApplication extends Application {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        Log.v(TAG,"Application Terminated");
+        Log.v(TAG, "Application Terminated");
     }
 }

@@ -23,6 +23,7 @@ import com.music.aditya.mcfinalproject.R;
 import com.music.aditya.mcfinalproject.controller.MusicController;
 import com.music.aditya.mcfinalproject.services.MusicService;
 import com.music.aditya.mcfinalproject.utils.Song;
+import com.music.aditya.mcfinalproject.utils.Utility;
 
 import java.util.ArrayList;
 
@@ -47,6 +48,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     private boolean isAttached = false;
     private boolean paused = false;
     private boolean playbackPaused = true;
+    private ImageView backgroundImage;
 
     public MusicPlayerFragment() {
         // Required empty public constructor
@@ -70,8 +72,14 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
             switch (msg.what) {
                 case MusicService.SET_SONG_TITLE:
                     String song_title = msg.getData().getString(MusicService.SONG_TITLE);
-                    if (getActivity() != null)
+                    String song_genre = msg.getData().getString(MusicService.SONG_GENRE);
+                    if (getActivity() != null) {
                         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(song_title);
+                        if (backgroundImage != null) {
+                            GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(backgroundImage);
+                            Glide.with(MusicPlayerFragment.this).load(Utility.getDrawableFromGenre(song_genre)).into(imageViewTarget);
+                        }
+                    }
                     setController();
                     break;
             }
@@ -246,15 +254,15 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_music_screen_control, container, false);
-        ImageView imageView = (ImageView) rootView.findViewById(R.id.music_screen_bg);
-        imageView.setOnClickListener(new View.OnClickListener() {
+        backgroundImage = (ImageView) rootView.findViewById(R.id.music_screen_bg);
+        backgroundImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (controller != null && !controller.isShowing())
                     controller.show();
             }
         });
-        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageView);
+        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(backgroundImage);
         Glide.with(this).load(R.drawable.dance).into(imageViewTarget);
 //        controller = new MusicController(getActivity());
         return rootView;

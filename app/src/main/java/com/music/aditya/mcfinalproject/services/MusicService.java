@@ -50,6 +50,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private static final int NOTIFY_ID = 1;
 
     public static final String SONG_TITLE = "song_title";
+    public static final String SONG_GENRE = "song_genre";
     public static final int SET_SONG_TITLE = 221;
 
     private CameraManager mCameraManager;
@@ -333,6 +334,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Bundle bundle = new Bundle();
         Message message = handler.obtainMessage();
         bundle.putString(SONG_TITLE, songTitle);
+        bundle.putString(SONG_GENRE,songsList.get(songPosition).getGenre());
         message.what = SET_SONG_TITLE;
         message.setData(bundle);
         handler.sendMessage(message);

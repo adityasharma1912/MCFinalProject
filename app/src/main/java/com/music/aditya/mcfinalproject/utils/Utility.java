@@ -24,6 +24,7 @@ public class Utility {
 
     // hash-map of artists as key and Genre as value...
     private static HashMap<String, String> mapArtistGenre = null;
+    private static HashMap<String, Integer> mapGenreImage = null;
     public static final int SUGGESTION_LIMIT = 20;
     public static boolean flashLightBoolean;
 
@@ -44,6 +45,18 @@ public class Utility {
         mapArtistGenre.put("Eagles", "Soft Rock");
         mapArtistGenre.put("Jimi Hendrix", "Blues");
     }
+
+    public static void loadGenreImageHashMap() {
+        mapGenreImage = new HashMap<>();
+        mapGenreImage.put("Pop", R.drawable.pop);
+        mapGenreImage.put("Hip Hop", R.drawable.hiphop);
+        mapGenreImage.put("Hard Rock", R.drawable.hard_rock);
+        mapGenreImage.put("Blues", R.drawable.blues);
+        mapGenreImage.put("Metal", R.drawable.metal);
+        mapGenreImage.put("Soft Rock", R.drawable.soft_rock);
+        mapGenreImage.put("Unknown", R.drawable.music_icon);
+    }
+
 
     public static void navigateFragment(Fragment fragment, String tag, Bundle bundle, FragmentActivity fragmentActivity) {
         boolean fragmentPopped = false;
@@ -88,5 +101,12 @@ public class Utility {
         if (mapArtistGenre != null && mapArtistGenre.containsKey(artist))
             return mapArtistGenre.get(artist);
         return "Unknown";
+    }
+
+    public static Integer getDrawableFromGenre(String song_genre) {
+        if (mapGenreImage.containsKey(song_genre))
+            return mapGenreImage.get(song_genre);
+        else
+            return R.drawable.music_icon;
     }
 }
