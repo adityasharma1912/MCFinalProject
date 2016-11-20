@@ -6,10 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,6 +36,7 @@ public class MusicPlayerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, CompoundButton.OnCheckedChangeListener {
 
     private static final int PERMISSIONS_REQUEST_STORAGE = 102;
+    private static final int PERMISSIONS_REQUEST_CAMERA = 103;
     Switch flashLightToggle, autoBrightToggle;
     private MusicService musicService;
     private boolean musicBound;
@@ -51,13 +57,15 @@ public class MusicPlayerActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        String[] permission = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (Utility.checkForPermission(this, permission, PERMISSIONS_REQUEST_STORAGE)) {
-            Utility.navigateFragment(new MusicGenreFragment(), MusicGenreFragment.TAG, null, MusicPlayerActivity.this);
-        } else {
-            Utility.showToast(MusicPlayerActivity.this, "Need storage permissions");
-            finish();
-        }
+//        String[] permission = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+//        if (Utility.checkForPermission(this, permission, PERMISSIONS_REQUEST_STORAGE)) {
+        Utility.navigateFragment(new MusicGenreFragment(), MusicGenreFragment.TAG, null, MusicPlayerActivity.this);
+//        } else {
+//            Utility.showToast(MusicPlayerActivity.this, "Need storage permissions");
+//            finish();
+//        }
+
+        checkAndRequestWriteSettingsAndStoragePermissions();
 
         flashLightToggle = (Switch) navigationView.getMenu().findItem(R.id.nav_flash_light_switch).
                 getActionView().findViewById(R.id.flash_light_toggle_switch);
@@ -65,13 +73,48 @@ public class MusicPlayerActivity extends AppCompatActivity
                 getActionView().findViewById(R.id.auto_brightness_toggle_switch);
         flashLightToggle.setChecked(true);
         Utility.flashLightBoolean = true;
-        autoBrightToggle.setChecked(false);
+        autoBrightToggle.setChecked(true);
+        turnOnAutoBrightness();
         flashLightToggle.setOnCheckedChangeListener(this);
         autoBrightToggle.setOnCheckedChangeListener(this);
 
         Intent playIntent = new Intent(this, MusicService.class);
         startService(playIntent);
         bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    void checkAndRequestWriteSettingsAndStoragePermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAMERA: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+                    Utility.showToast(this, "Sorry!!! Camera permissions are required");
+                    finish();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -163,7 +206,7 @@ public class MusicPlayerActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_home) {
             Utility.showToast(MusicPlayerActivity.this, "Launching MusicGenreFragment");
             Utility.navigateFragment(new MusicGenreFragment(), MusicGenreFragment.TAG, null, MusicPlayerActivity.this);
         } else if (id == R.id.nav_clear_suggestions) {
@@ -185,10 +228,19 @@ public class MusicPlayerActivity extends AppCompatActivity
             else
                 autoBrightToggle.setChecked(true);
         } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+            if (musicService != null && musicBound != false && musicService.isPlaying()) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, musicService.getShareMessage());
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            } else {
+                Utility.showToast(this, "Play Some Song first to share its Title");
+            }
         }
+//        else if (id == R.id.nav_send) {
+//
+//        }
 //        Toast.makeText(MusicPlayerActivity.this, "Launching Audio Player", Toast.LENGTH_SHORT).show();
 
 //        FragmentManager fragmentManager = getSupportFragmentManager();
@@ -224,15 +276,38 @@ public class MusicPlayerActivity extends AppCompatActivity
 
     private void turnOffAutoBrightness() {
         Utility.showToast(this, "turnOffAutoBrightness");
+        boolean canDo = Settings.System.canWrite(this);
+        if (false == canDo) {
+            Intent grantIntent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            startActivity(grantIntent);
+        } else {
+            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+        }
     }
 
     private void turnOnAutoBrightness() {
         Utility.showToast(this, "turnOnAutoBrightness");
+
+        boolean canDo = Settings.System.canWrite(this);
+        if (false == canDo) {
+            Intent grantIntent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            startActivity(grantIntent);
+        } else {
+            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE,
+                    Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+        }
     }
 
     private void turnOffFlashLightService() {
         Utility.showToast(this, "turnOffFlashLightService");
-        Utility.flashLightBoolean = false;
+        if (musicService != null && musicBound != false) {
+            Utility.flashLightBoolean = false;
+            musicService.turnOffFlashLight();
+        } else {
+            Utility.showToast(this, "service not bonded");
+            flashLightToggle.setChecked(false);
+        }
     }
 
     private void turnOnFlashLightService() {

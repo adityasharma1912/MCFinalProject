@@ -99,6 +99,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
+    public String getShareMessage() {
+        return "Hey Check out this " + songsList.get(songPosition).getGenre() + " song with Title: " + songTitle
+                + " by " + songsList.get(songPosition).getArtist();
+    }
+
     class FlashLightThread extends Thread {
         @Override
         public void run() {
@@ -267,12 +272,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.pause();
     }
 
-    public void seek(int posn) {
-        player.seekTo(posn);
+    public void seek(int position) {
+        player.seekTo(position);
     }
 
     public void startPlayer() {
         player.start();
+        startFlashLightThread();
     }
 
     public void playPrevious() {

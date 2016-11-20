@@ -68,7 +68,7 @@ public class Utility {
 
     public static void showToast(Context context, String msg) {
         if (msg != null && !msg.trim().equalsIgnoreCase("")) {
-            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
         }
     }
 

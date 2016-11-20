@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -31,7 +32,9 @@ import java.util.List;
 public class MusicSongsFragment extends Fragment {
 
     public static final String TAG = MusicSongsFragment.class.getCanonicalName();
+    public static final String ARG_GENRE = "genre";
     public static final String ARG_GENRE_SONG_LIST = "genre_songs";
+    private String genreSelected;
     private ArrayList<Song> songsList;
     private RecyclerView songView;
     private HashMap<String, Integer> songsMap = new HashMap<>();
@@ -50,6 +53,7 @@ public class MusicSongsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             songsList = getArguments().getParcelableArrayList(ARG_GENRE_SONG_LIST);
+            genreSelected = getArguments().getString(ARG_GENRE);
         }
     }
 
@@ -57,6 +61,8 @@ public class MusicSongsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.v(TAG, "onCreateView");
+        if (getActivity() != null)
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(genreSelected);
         View rootView = inflater.inflate(R.layout.fragment_genre_songs, container, false);
         songView = (RecyclerView) rootView.findViewById(R.id.song_list);
         songView.setLayoutManager(new LinearLayoutManager(getActivity()));

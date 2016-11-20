@@ -44,7 +44,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     private MusicService musicSrv;
     private MusicController controller;
     private boolean musicBound = false;
-
+    private boolean isAttached = false;
     private boolean paused = false;
     private boolean playbackPaused = true;
 
@@ -119,7 +119,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
         if (getActivity() != null)
             controller.setAnchorView(getActivity().findViewById(R.id.music_screen_bg));
         controller.setEnabled(true);
-//        if (!controller.isShown())
+        if (/*!controller.isShown() &&*/ isAttached == true)
             controller.show();
     }
 
@@ -282,6 +282,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        isAttached = true;
         if (controller != null && !controller.isShown())
             controller.show();
 //        if (context instanceof OnFragmentInteractionListener) {
@@ -295,6 +296,7 @@ public class MusicPlayerFragment extends Fragment implements MediaController.Med
     @Override
     public void onDetach() {
         super.onDetach();
+        isAttached = false;
         if (controller != null && controller.isShown())
             controller.realHide();
         if (musicBound == true) {

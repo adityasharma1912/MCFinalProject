@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -56,6 +57,8 @@ public class MusicGenreFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.v(TAG, "onCreateView");
+        if (getActivity() != null)
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Music by Genre");
         View rootView = inflater.inflate(R.layout.fragment_music_library, container, false);
         genresView = (RecyclerView) rootView.findViewById(R.id.genres_list);
         genresView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -200,6 +203,7 @@ public class MusicGenreFragment extends Fragment {
                 case R.id.genre_layout:
                     Utility.showToast(getActivity(), "genre with title : " + genre.getText() + " requested");
                     Bundle bundle = new Bundle();
+                    bundle.putString(MusicSongsFragment.ARG_GENRE, genre.getText().toString());
                     bundle.putParcelableArrayList(MusicSongsFragment.ARG_GENRE_SONG_LIST, new ArrayList(mapGenreSongs.get(genre.getText())));
                     Utility.navigateFragment(new MusicSongsFragment(), MusicSongsFragment.TAG, bundle, getActivity());
                     break;
